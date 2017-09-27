@@ -10,7 +10,7 @@ Usage:
         python imports_tree.py D:\Reps\dart_web_toolkit\test\dart_web_toolkit_test.dart D:\Reps\dart_web_toolkit\packages
 ```
 
-Exmple of output:
+Example of output:
 
 ```
 2017-09-27 22:59:28,182 INFO 'D:\Reps\dart_web_toolkit\test\dart_web_toolkit_test.dart'
