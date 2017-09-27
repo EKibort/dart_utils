@@ -10,7 +10,7 @@ class ImportElement:
 
 class DartImportTree:
 	def __init__(self, packages_dir):
-		self.importpattern = re.compile('\\s*import\\s*[\',\"](.*)[\',\"]')
+		self.importpattern = re.compile('\\s*import\\s*[\',\"](.*?)[\',\"]')
 		self.packages_dir = packages_dir
 		self.indent = "  "
 
