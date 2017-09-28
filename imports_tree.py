@@ -13,6 +13,7 @@ class DartImportTree:
 		self.importpattern = re.compile('\\s*import\\s*[\',\"](.*?)[\',\"]')
 		self.packages_dir = packages_dir
 		self.indent = "  "
+		self.allimports = []
 
 	def _getFileLines(self, filename):
 		if not os.path.isfile(filename):
@@ -22,15 +23,15 @@ class DartImportTree:
 	def _getFileNameByImport(self, root_dir, importtext):
 		if importtext.startswith('dart:'):
 			return importtext
-
+			
 		if importtext.startswith('package:'):
-			return os.path.join(self.packages_dir , importtext[8:])
+			return os.path.abspath(os.path.join(self.packages_dir , importtext[8:]))
 
-		return os.path.join(root_dir, importtext)
+		return os.path.abspath(os.path.join(root_dir, importtext))
 
 
 	def parse(self, filename, indent="", stack=[]):
-		imports = []
+		imports = []        
 		logging.info("{0}'{1}'".format(indent, filename))
 		script_dir = os.path.dirname(filename)
 		for line in self._getFileLines(filename):
@@ -38,10 +39,19 @@ class DartImportTree:
 			if match:
 				imptext = match.group(1)
 				impfile = self._getFileNameByImport(script_dir, imptext)
-				if impfile not in stack:
-					imports.append(self.parse(impfile, indent + self.indent, stack + [impfile]))
+
+				append = True
+				if impfile in stack:
+					logging.info("{0}'{1}' - [loop detected]".format(indent + self.indent, impfile))
+					append = False
+				elif impfile in self.allimports:
+					logging.info("{0}'{1}' - [repeat detected]".format(indent + self.indent, impfile))
+					append = False
 				else:
-					logging.info("{0}'{1}' - loop detected".format(indent + self.indent, impfile))
+					self.allimports.append(impfile)
+                
+				if append:
+					imports.append(self.parse(impfile, indent + self.indent, stack + [impfile]))
 
 
 		return ImportElement(filename, imports)
